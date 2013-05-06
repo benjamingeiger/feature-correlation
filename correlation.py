@@ -6,9 +6,9 @@ from math import isnan
 
 from getopt import getopt, GetoptError
 
-import numpy as N
-import scipy as S
-import scipy.stats as Ss
+import numpy as np
+import scipy as sp
+import scipy.stats as sps
 
 #import sklearn.datasets as Lds
 
@@ -75,8 +75,8 @@ def read_data(input_file_name, get_feature_names=True):
         input_file = stdin
 
     feature_names = input_file.readline()[:-1].split(",")
-    data = S.genfromtxt(input_file, delimiter=",", skip_header=0)
-    data, true_results = N.hsplit(data, (-1,))
+    data = sp.genfromtxt(input_file, delimiter=",", skip_header=0)
+    data, true_results = np.hsplit(data, (-1,))
     true_results = true_results.transpose()[0]
 
     if isnan(true_results[0]):
@@ -96,7 +96,7 @@ def find_correlation(features):
         for j in range(i + 1, num_features):
             right_features = features[:, j]
 
-            corr, p = Ss.pearsonr(left_features, right_features)
+            corr, p = sps.pearsonr(left_features, right_features)
 
             correlation[(i, j)] = (corr, p)
 
@@ -107,7 +107,7 @@ def main():
     name, print_names = parse_options(argv)
     results, features, feature_names = read_data(name)
 
-    features = N.hstack((features, results.reshape((len(results), 1))))
+    features = np.hstack((features, results.reshape((len(results), 1))))
 
     correlation = find_correlation(features)
 
