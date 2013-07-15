@@ -1,18 +1,17 @@
 from __future__ import print_function
 
-from sys import argv, stdin, stderr, exit
-
-from math import isnan
+from sys import argv, stderr, exit
 
 from getopt import getopt, GetoptError
 
 import numpy as np
-import scipy as sp
 import scipy.stats as sps
 
 #import sklearn.datasets as Lds
 
 from utilities import debug as debug_print
+
+from data import read_data
 
 
 def debug_silence(string):
@@ -65,25 +64,6 @@ def parse_options(argv):
         exit(2)
 
     return input_file_name, print_names
-
-
-def read_data(input_file_name, get_feature_names=True):
-    """Pull data from the specified file."""
-    if input_file_name != "":
-        input_file = open(input_file_name, "r")
-    else:
-        input_file = stdin
-
-    feature_names = input_file.readline()[:-1].split(",")
-    data = sp.genfromtxt(input_file, delimiter=",", skip_header=0)
-    data, true_results = np.hsplit(data, (-1,))
-    true_results = true_results.transpose()[0]
-
-    if isnan(true_results[0]):
-        data = data[1:]
-        true_results = true_results[1:]
-
-    return true_results, data, feature_names
 
 
 def find_correlation(features):
