@@ -26,65 +26,12 @@ else:
     debug = debug_silence
 
 
-def print_help():
-    """Print usage information."""
-
-    print("Usage: python {} [options] [filename]".format(argv[0]),
-            file=stderr)
-    print(file=stderr)
-    print("Options:", file=stderr)
-    print("    -h, -?, --help:", file=stderr)
-    print("        This message.", file=stderr)
-    print("    -n, --print-names:", file=stderr)
-    print("        Print feature names instead of numbers.", file=stderr)
 
 
-def parse_options(argv):
-    """Parse command line options and arguments."""
+FEATURE_FILENAME = "/home/bgeiger/Dropbox/Research/Features/LIDC_features_33_cases_46_features_normalized_-1to1.fixed.csv"
 
-    try:
-        opts, args = getopt(argv[1:], "?hn", ["help", "print-names"])
-    except GetoptError:
-        print_help()
-        exit(1)
+RELIEFF_FILENAME = "/home/bgeiger/Dropbox/Research/Features/Relief-F ranking 46.txt"
 
-    input_file_name = ""
-    print_names = False
-
-    for opt, arg in opts:
-        if opt in ["-h", "-?", "--help"]:
-            print_help()
-            exit(1)
-        if opt in ["-n", "--print-names"]:
-            print_names = True
-
-    if len(args) == 1:
-        input_file_name = args[0]
-    elif len(args) > 1:
-        print_help()
-        exit(2)
-
-    return input_file_name, print_names
-
-
-#NOTE: This is brittle. I'll work on making it robust later.
-def relieff(results, instances, neighbors=10, samplesize=-1, sigma=2):
-
-    # Set up the lists for neighbor finding.
-    classes = set(int(round(r)) for r in results)
-
-    if len(results) != len(instances):
-        raise Exception("Number of results != number of instances.")
-
-    elements = {}
-    for c in classes:
-        elements[c] = []
-
-    for i in len(instances):
-        elements[results[int(round(results[i]))]].append(results[i])
-
-    for c in classes:
-        elements[c].sort()
 
 
 def parse_relieff_list(filetext):
@@ -117,12 +64,11 @@ def select_features(features, relieff_features, correlations, threshold=0.9):
 
 
 def main():
-    relieff_file = open("/home/bgeiger/Dropbox/Research/Features/Relief-F ranking 46.txt", "r")
+    relieff_file = open(RELIEFF_FILENAME, "r")
     relieff_features = parse_relieff_list(relieff_file.readlines())
     relieff_features.sort(key=lambda x: x[0], reverse=True)
 
-    name, print_names = parse_options(argv)
-    results, features, feature_names = read_data(name)
+    results, features, feature_names = read_data(FEATURE_FILENAME)
 
     #features = np.hstack((features, results.reshape((len(results), 1))))
 
