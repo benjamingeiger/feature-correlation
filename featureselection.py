@@ -4,13 +4,12 @@ from sys import argv, stderr, exit
 
 from getopt import getopt, GetoptError
 
-import numpy as np
-
 import re
 
 #import sklearn.datasets as Lds
 
 from utilities import debug as debug_print
+from utilities import frange
 
 from data import read_data
 from correlation import find_correlation
@@ -74,7 +73,7 @@ def relieff(results, instances, neighbors=10, samplesize=-1, sigma=2):
     # Set up the lists for neighbor finding.
     classes = set(int(round(r)) for r in results)
 
-    if len(results) != len(features):
+    if len(results) != len(instances):
         raise Exception("Number of results != number of instances.")
 
     elements = {}
@@ -94,22 +93,7 @@ def parse_relieff_list(filetext):
     return [(float(x[0]), int(x[1]) - 1, x[2]) for x in fileparts]
 
 
-def main():
-    relieff_file = open("/home/bgeiger/Dropbox/Research/Features/Relief-F ranking 218.txt", "r")
-    relieff_features = parse_relieff_list(relieff_file.readlines())
-    relieff_features.sort(key=lambda x: x[0], reverse=True)
-
-    name, print_names = parse_options(argv)
-    results, features, feature_names = read_data(name)
-
-    #features = np.hstack((features, results.reshape((len(results), 1))))
-
-    correlations = find_correlation(features)
-    #print("\n".join("{}: {}".format(x, correlations[x]) for x in correlations))
-    #return
-
-    threshold = 0.9
-
+def select_features(features, relieff_features, correlations, threshold=0.9):
     selected = [relieff_features[0][1]]
     index = 1
     #while len(selected) < 10 and index < features.shape[1]:
@@ -129,8 +113,34 @@ def main():
             selected.append(current)
         index += 1
 
-    print("Count:", len(selected))
-    print("\n".join(["{} ({})".format(x, feature_names[x]) for x in selected]))
+    return selected
+
+
+def main():
+    relieff_file = open("/home/bgeiger/Dropbox/Research/Features/Relief-F ranking 46.txt", "r")
+    relieff_features = parse_relieff_list(relieff_file.readlines())
+    relieff_features.sort(key=lambda x: x[0], reverse=True)
+
+    name, print_names = parse_options(argv)
+    results, features, feature_names = read_data(name)
+
+    #features = np.hstack((features, results.reshape((len(results), 1))))
+
+    correlations = find_correlation(features)
+    #print("\n".join("{}: {}".format(x, correlations[x]) for x in correlations))
+    #return
+
+    for threshold in frange(1.0, 0.0, -0.1):
+        selected = select_features(features, relieff_features, correlations, threshold)
+
+        print("============================================================")
+        print("THRESHOLD =", threshold)
+        print("Count:", len(selected))
+        print("\n".join(["{} ({})".format(x, feature_names[x]) for x in selected]))
+
+        print()
+        print()
+        print()
 
 
 if __name__ == "__main__":
