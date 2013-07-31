@@ -14,7 +14,7 @@ from utilities import debug as debug_print
 from data import read_data
 
 
-def debug_silence(string):
+def debug_silence(*args, **kwargs):
     pass
 
 

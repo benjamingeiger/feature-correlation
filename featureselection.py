@@ -15,7 +15,7 @@ from data import read_data
 from correlation import find_correlation
 
 
-def debug_silence(string):
+def debug_silence(*args, **kwargs):
     pass
 
 
